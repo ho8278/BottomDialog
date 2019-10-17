@@ -8,13 +8,16 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 
-class BottomDialog : DialogFragment() {
+class BottomDialog : DialogFragment {
     var positiveText: String? = null
     var negativeText: String? = null
-    var layoutResID: Int? = null
     var positiveTextColor: Int = Color.parseColor("#28A0FF")
     var negativeTextColor: Int = Color.parseColor("#000000")
+    var positiveClickListener : ButtonClickListener? = null
+    var negativeClickListener : ButtonClickListener? = null
     var isButtonView: Boolean = false
+    var layoutResID: Int? = null
+    private constructor():super()
     //Builder 클래스 추가
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,21 +90,31 @@ class BottomDialog : DialogFragment() {
                     setMargins(32, 0, 32, 0)
                     this
                 }
+                setOnClickListener {
+                    positiveClickListener?.onClick()
+                }
             }
             val negativeTextView = TextView(context)
             negativeTextView.apply {
                 setText(negativeText ?: "취소")
                 setTextColor(negativeTextColor)
                 gravity = Gravity.CENTER
-                val params = LinearLayout.LayoutParams(
+                layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 )
-                layoutParams = params
+                setOnClickListener {
+                    negativeClickListener?.onClick()
+                }
             }
             addView(negativeTextView)
             addView(positiveTextView)
         }
         return horizontalLinearLayout
+    }
+
+
+    interface ButtonClickListener{
+        fun onClick()
     }
 }
