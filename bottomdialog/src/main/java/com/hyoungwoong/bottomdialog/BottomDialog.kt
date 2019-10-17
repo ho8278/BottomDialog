@@ -7,17 +7,24 @@ import android.view.*
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentManager
 
 class BottomDialog : DialogFragment {
-    var positiveText: String? = null
-    var negativeText: String? = null
-    var positiveTextColor: Int = Color.parseColor("#28A0FF")
-    var negativeTextColor: Int = Color.parseColor("#000000")
-    var positiveClickListener : ButtonClickListener? = null
-    var negativeClickListener : ButtonClickListener? = null
-    var isButtonView: Boolean = false
-    var layoutResID: Int? = null
-    private constructor():super()
+    companion object {
+        var TAG = BottomDialog::class.java.simpleName
+        lateinit var positiveText: String
+        lateinit var negativeText: String
+        var positiveTextColor: Int = Color.parseColor("#28A0FF")
+        var negativeTextColor: Int = Color.parseColor("#000000")
+        var positiveClickListener: TextViewClickListener? = null
+        var negativeClickListener: TextViewClickListener? = null
+        var isPositiveTextView = false
+        var isNegativeTextView = false
+        var layoutResID: Int? = null
+    }
+
+    private constructor() : super()
+
     //Builder 클래스 추가
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,77 +51,135 @@ class BottomDialog : DialogFragment {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        var buttonLinearView: View? = null
-        if (isButtonView) {
-            buttonLinearView = createButtonView()
+        var textLinearView: View? = null
+        if (isNegativeTextView || isPositiveTextView) {
+            textLinearView = createTextView()
         }
         var view = LinearLayout(context)
         view.apply {
             orientation = LinearLayout.VERTICAL
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            if(buttonLinearView != null)
-                view.addView(buttonLinearView)
-            if(layoutResID != null){
-                var userView = inflater.inflate(layoutResID!!,this,false)
-                addView(userView,0)
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+            if (textLinearView != null)
+                view.addView(textLinearView)
+            if (layoutResID != null) {
+                var userView = inflater.inflate(layoutResID!!, this, false)
+                addView(userView, 0)
             }
         }
         return view
     }
 
-    private fun createButtonView(): View {
+    private fun createTextView(): View {
         var horizontalLinearLayout = LinearLayout(context)
         //Button 있는 리니어레이아웃
         horizontalLinearLayout.apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.RIGHT
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            ).run {
-                setMargins(0,8,0,0)
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+                .run {
+                setMargins(0, 8, 0, 0)
                 this
             }
-            val positiveTextView = TextView(context)
-            positiveTextView.apply {
-                setText(positiveText ?: "확인")
-                setTextColor(positiveTextColor)
-                gravity = Gravity.CENTER
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                ).run {
-                    setMargins(32, 0, 32, 0)
-                    this
+
+
+            if (isNegativeTextView) {
+                val negativeTextView = TextView(context)
+                negativeTextView.apply {
+                    setText(negativeText)
+                    setTextColor(negativeTextColor)
+                    layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+                    setOnClickListener {
+                        negativeClickListener?.onClick()
+                    }
                 }
-                setOnClickListener {
-                    positiveClickListener?.onClick()
-                }
+                addView(negativeTextView)
             }
-            val negativeTextView = TextView(context)
-            negativeTextView.apply {
-                setText(negativeText ?: "취소")
-                setTextColor(negativeTextColor)
-                gravity = Gravity.CENTER
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                )
-                setOnClickListener {
-                    negativeClickListener?.onClick()
+
+
+            if (isPositiveTextView) {
+                val positiveTextView = TextView(context)
+                positiveTextView.apply {
+                    setText(positiveText)
+                    setTextColor(positiveTextColor)
+                    layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+                        .run {
+                        setMargins(32, 0, 32, 0)
+                        this
+                    }
+                    setOnClickListener {
+                        positiveClickListener?.onClick()
+                    }
                 }
+                addView(positiveTextView)
             }
-            addView(negativeTextView)
-            addView(positiveTextView)
         }
         return horizontalLinearLayout
     }
 
+    class BottomDialogBuilder {
+        private var cancel = false
+        private lateinit var instance: BottomDialog
 
-    interface ButtonClickListener{
+        init {
+            instance = BottomDialog()
+        }
+
+        fun setPositiveTextView(text: String = "확인", color: Int = Color.parseColor("#28A0FF"), listener: TextViewClickListener? = null): BottomDialogBuilder {
+            positiveText = text
+            positiveTextColor = color
+            positiveClickListener = listener
+            isPositiveTextView = true
+            return this
+        }
+
+        fun setPositiveTextView(text: String = "확인", color: Int = Color.parseColor("#28A0FF"), listener: () -> Unit = { instance.dismiss() }): BottomDialogBuilder {
+            positiveText = text
+            positiveTextColor = color
+            positiveClickListener = object : TextViewClickListener {
+                override fun onClick() {
+                    listener()
+                }
+            }
+            isPositiveTextView = true
+            return this
+        }
+
+        fun setNegativeTextView(text: String = "취소", color: Int = Color.parseColor("#000000"), listener: TextViewClickListener? = null): BottomDialogBuilder {
+            negativeText = text
+            negativeTextColor = color
+            negativeClickListener = listener
+            isNegativeTextView = true
+            return this
+        }
+
+        fun setNegativeTextView(text: String = "취소", color: Int = Color.parseColor("#000000"), listener: () -> Unit = { instance.dismiss() }): BottomDialogBuilder {
+            negativeText = text
+            negativeTextColor = color
+            negativeClickListener = object : TextViewClickListener {
+                override fun onClick() {
+                    listener()
+                }
+            }
+            isNegativeTextView = true
+            return this
+        }
+
+        fun setLayout(layoutRes: Int): BottomDialogBuilder {
+            layoutResID = layoutRes
+            return this
+        }
+
+        fun setCancelable(isCancelable: Boolean): BottomDialogBuilder {
+            cancel = isCancelable
+            return this
+        }
+
+        fun build(manager: FragmentManager) {
+            instance.show(manager, TAG)
+        }
+    }
+
+    interface TextViewClickListener {
         fun onClick()
     }
 }
