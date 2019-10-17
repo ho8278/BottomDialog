@@ -15,17 +15,18 @@ class BottomDialog : DialogFragment {
         var TAG = BottomDialog::class.java.simpleName
         lateinit var positiveText: String
         lateinit var negativeText: String
-        var positiveTextColor: Int = Color.parseColor("#28A0FF")
-        var negativeTextColor: Int = Color.parseColor("#000000")
-        var positiveClickListener: TextViewClickListener? = null
-        var negativeClickListener: TextViewClickListener? = null
-        var isPositiveTextView = false
-        var isNegativeTextView = false
-        var layoutResID: Int? = null
+        private var positiveTextColor: Int = Color.parseColor("#28A0FF")
+        private var negativeTextColor: Int = Color.parseColor("#000000")
+        private var positiveClickListener: TextViewClickListener? = null
+        private var negativeClickListener: TextViewClickListener? = null
+        private var isPositiveTextView = false
+        private var isNegativeTextView = false
+        private var layoutResID: Int? = null
+        private var messageBody:String = ""
     }
     private var defaultTextSize = 16.0f
     private constructor() : super()
-
+    private val baseLayout = R.layout.basedialog
     //Builder 클래스 추가
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,16 +57,16 @@ class BottomDialog : DialogFragment {
         if (isNegativeTextView || isPositiveTextView) {
             textLinearView = createTextView()
         }
-        var view = LinearLayout(context)
+        var view = inflater.inflate(baseLayout,container,false) as LinearLayout
         view.apply {
-            orientation = LinearLayout.VERTICAL
-            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
             if (textLinearView != null)
-                view.addView(textLinearView)
+                addView(textLinearView)
             if (layoutResID != null) {
                 var userView = inflater.inflate(layoutResID!!, this, false)
                 addView(userView, 0)
             }
+            if(!messageBody.isEmpty())
+                view.findViewById<TextView>(R.id.tv_msg).text = messageBody
         }
         return view
     }
@@ -120,7 +121,7 @@ class BottomDialog : DialogFragment {
     }
 
     class BottomDialogBuilder {
-        private var cancel = false
+        private var cancel = true
         private val instance: BottomDialog
 
         init {
@@ -178,6 +179,11 @@ class BottomDialog : DialogFragment {
 
         fun setCancelable(isCancelable: Boolean): BottomDialogBuilder {
             cancel = isCancelable
+            return this
+        }
+
+        fun setMessage(msg:String):BottomDialogBuilder{
+            messageBody = msg
             return this
         }
 
