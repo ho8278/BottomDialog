@@ -1,4 +1,4 @@
-package com.hyoungwoong.bottomdialog
+package com.example.sample
 
 import org.junit.Test
 
