@@ -3,6 +3,7 @@ package com.hyoungwoong.bottomdialog
 import android.app.Dialog
 import android.graphics.Color
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.*
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -22,7 +23,7 @@ class BottomDialog : DialogFragment {
         var isNegativeTextView = false
         var layoutResID: Int? = null
     }
-
+    private var defaultTextSize = 16.0f
     private constructor() : super()
 
     //Builder 클래스 추가
@@ -87,6 +88,7 @@ class BottomDialog : DialogFragment {
                 negativeTextView.apply {
                     setText(negativeText)
                     setTextColor(negativeTextColor)
+                    setTextSize(TypedValue.COMPLEX_UNIT_SP,defaultTextSize)
                     layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
                     setOnClickListener {
                         negativeClickListener?.onClick()
@@ -101,6 +103,7 @@ class BottomDialog : DialogFragment {
                 positiveTextView.apply {
                     setText(positiveText)
                     setTextColor(positiveTextColor)
+                    setTextSize(TypedValue.COMPLEX_UNIT_SP,defaultTextSize)
                     layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
                         .run {
                             setMargins(32, 0, 32, 0)
