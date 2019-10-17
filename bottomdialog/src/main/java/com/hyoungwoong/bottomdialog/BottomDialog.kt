@@ -77,9 +77,9 @@ class BottomDialog : DialogFragment {
             gravity = Gravity.RIGHT
             layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
                 .run {
-                setMargins(0, 8, 0, 0)
-                this
-            }
+                    setMargins(0, 8, 0, 0)
+                    this
+                }
 
 
             if (isNegativeTextView) {
@@ -103,9 +103,9 @@ class BottomDialog : DialogFragment {
                     setTextColor(positiveTextColor)
                     layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
                         .run {
-                        setMargins(32, 0, 32, 0)
-                        this
-                    }
+                            setMargins(32, 0, 32, 0)
+                            this
+                        }
                     setOnClickListener {
                         positiveClickListener?.onClick()
                     }
@@ -118,11 +118,13 @@ class BottomDialog : DialogFragment {
 
     class BottomDialogBuilder {
         private var cancel = false
-        private lateinit var instance: BottomDialog
+        private val instance: BottomDialog
 
         init {
             instance = BottomDialog()
         }
+
+        /*
 
         fun setPositiveTextView(text: String = "확인", color: Int = Color.parseColor("#28A0FF"), listener: TextViewClickListener? = null): BottomDialogBuilder {
             positiveText = text
@@ -131,6 +133,16 @@ class BottomDialog : DialogFragment {
             isPositiveTextView = true
             return this
         }
+
+        fun setNegativeTextView(text: String = "취소", color: Int = Color.parseColor("#000000"), listener: TextViewClickListener? = null): BottomDialogBuilder {
+            negativeText = text
+            negativeTextColor = color
+            negativeClickListener = listener
+            isNegativeTextView = true
+            return this
+        }
+
+        */
 
         fun setPositiveTextView(text: String = "확인", color: Int = Color.parseColor("#28A0FF"), listener: () -> Unit = { instance.dismiss() }): BottomDialogBuilder {
             positiveText = text
@@ -141,14 +153,6 @@ class BottomDialog : DialogFragment {
                 }
             }
             isPositiveTextView = true
-            return this
-        }
-
-        fun setNegativeTextView(text: String = "취소", color: Int = Color.parseColor("#000000"), listener: TextViewClickListener? = null): BottomDialogBuilder {
-            negativeText = text
-            negativeTextColor = color
-            negativeClickListener = listener
-            isNegativeTextView = true
             return this
         }
 
@@ -175,6 +179,7 @@ class BottomDialog : DialogFragment {
         }
 
         fun build(manager: FragmentManager) {
+            instance.isCancelable = cancel
             instance.show(manager, TAG)
         }
     }

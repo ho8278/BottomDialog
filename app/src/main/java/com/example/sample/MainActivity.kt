@@ -1,5 +1,6 @@
 package com.example.sample
 
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
@@ -13,8 +14,7 @@ class MainActivity : AppCompatActivity() {
         BottomDialog.BottomDialogBuilder()
             .setLayout(R.layout.test)
             .setCancelable(false)
-            .setNegativeTextView{
-                Toast.makeText(baseContext,"야!",Toast.LENGTH_SHORT).show()
-            }.build(supportFragmentManager)
+            .setNegativeTextView()
+            .build(supportFragmentManager)
     }
 }
