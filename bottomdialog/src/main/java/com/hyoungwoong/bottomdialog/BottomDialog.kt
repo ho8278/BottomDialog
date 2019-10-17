@@ -1,24 +1,31 @@
 package com.hyoungwoong.bottomdialog
 
 import android.app.Dialog
+import android.content.Context
+import android.content.DialogInterface
 import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.*
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.annotation.ColorRes
+import androidx.annotation.StringRes
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
+import java.lang.ref.WeakReference
 
-class BottomDialog : DialogFragment {
+class BottomDialog : DialogFragment, BottomListener{
     companion object {
         var TAG = BottomDialog::class.java.simpleName
-        lateinit var positiveText: String
-        lateinit var negativeText: String
+        lateinit var positiveText: CharSequence
+        lateinit var negativeText: CharSequence
         private var positiveTextColor: Int = Color.parseColor("#28A0FF")
         private var negativeTextColor: Int = Color.parseColor("#000000")
-        private var positiveClickListener: TextViewClickListener? = null
-        private var negativeClickListener: TextViewClickListener? = null
+        private var positiveClickListener: BottomListener.OnClickListener? = null
+        private var negativeClickListener: BottomListener.OnClickListener? = null
         private var isPositiveTextView = false
         private var isNegativeTextView = false
         private var layoutResID: Int? = null
@@ -71,6 +78,10 @@ class BottomDialog : DialogFragment {
         return view
     }
 
+    override fun cancel() {
+        super.dismiss()
+    }
+
     private fun createTextView(): View {
         var horizontalLinearLayout = LinearLayout(context)
         //Button 있는 리니어레이아웃
@@ -92,7 +103,7 @@ class BottomDialog : DialogFragment {
                     setTextSize(TypedValue.COMPLEX_UNIT_SP,defaultTextSize)
                     layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
                     setOnClickListener {
-                        negativeClickListener?.onClick()
+                        negativeClickListener?.OnClick(this@BottomDialog)
                     }
                 }
                 addView(negativeTextView)
@@ -111,7 +122,7 @@ class BottomDialog : DialogFragment {
                             this
                         }
                     setOnClickListener {
-                        positiveClickListener?.onClick()
+                        positiveClickListener?.OnClick(this@BottomDialog)
                     }
                 }
                 addView(positiveTextView)
@@ -120,7 +131,7 @@ class BottomDialog : DialogFragment {
         return horizontalLinearLayout
     }
 
-    class BottomDialogBuilder {
+    class Builder(private val context:Context) {
         private var cancel = true
         private val instance: BottomDialog
 
@@ -128,25 +139,56 @@ class BottomDialog : DialogFragment {
             instance = BottomDialog()
         }
 
-        /*
 
-        fun setPositiveTextView(text: String = "확인", color: Int = Color.parseColor("#28A0FF"), listener: TextViewClickListener? = null): BottomDialogBuilder {
-            positiveText = text
-            positiveTextColor = color
+        fun setPositiveTextView(@StringRes textId: Int, listener: BottomListener.OnClickListener? = null): Builder {
+            positiveText = context.getText(textId)
             positiveClickListener = listener
             isPositiveTextView = true
             return this
         }
 
-        fun setNegativeTextView(text: String = "취소", color: Int = Color.parseColor("#000000"), listener: TextViewClickListener? = null): BottomDialogBuilder {
-            negativeText = text
-            negativeTextColor = color
+        fun setPositiveTextView(text: String, listener: BottomListener.OnClickListener? = null): Builder {
+            positiveText = text
+            positiveClickListener = listener
+            isPositiveTextView = true
+            return this
+        }
+
+        fun setPositiveTextViewColor(@ColorRes color:Int): Builder{
+            positiveTextColor = ContextCompat.getColor(context,color)
+            return this
+        }
+
+        fun setPositiveTextViewColor(color:String):Builder{
+            positiveTextColor = Color.parseColor(color)
+            return this
+        }
+
+        fun setNegativeTextView(@StringRes textId: Int, listener: BottomListener.OnClickListener? = null): Builder {
+            negativeText =  instance.context?.getText(textId).toString()
             negativeClickListener = listener
             isNegativeTextView = true
             return this
         }
 
-        */
+        fun setNegativeTextView(text: String, listener: BottomListener.OnClickListener? = null): Builder {
+            negativeText = text
+            negativeClickListener = listener
+            isNegativeTextView = true
+            return this
+        }
+
+        fun setNegativeTextViewColor(@ColorRes color:Int): Builder{
+            negativeTextColor = ContextCompat.getColor(context,color)
+            return this
+        }
+
+        fun setNegativeTextViewColor(color:String):Builder{
+            negativeTextColor = Color.parseColor(color)
+            return this
+        }
+
+        /*
 
         fun setPositiveTextView(text: String = "확인", color: Int = Color.parseColor("#28A0FF"), listener: () -> Unit = { instance.dismiss() }): BottomDialogBuilder {
             positiveText = text
@@ -172,17 +214,19 @@ class BottomDialog : DialogFragment {
             return this
         }
 
-        fun setLayout(layoutRes: Int): BottomDialogBuilder {
+        */
+
+        fun setLayout(layoutRes: Int): Builder {
             layoutResID = layoutRes
             return this
         }
 
-        fun setCancelable(isCancelable: Boolean): BottomDialogBuilder {
+        fun setCancelable(isCancelable: Boolean): Builder {
             cancel = isCancelable
             return this
         }
 
-        fun setMessage(msg:String):BottomDialogBuilder{
+        fun setMessage(msg:String):Builder{
             messageBody = msg
             return this
         }
@@ -193,7 +237,4 @@ class BottomDialog : DialogFragment {
         }
     }
 
-    interface TextViewClickListener {
-        fun onClick()
-    }
 }
