@@ -14,7 +14,7 @@ class BottomDialog : DialogFragment() {
     var layoutResID: Int? = null
     var positiveTextColor: Int = Color.parseColor("#28A0FF")
     var negativeTextColor: Int = Color.parseColor("#000000")
-    var isButtonView: Boolean = true
+    var isButtonView: Boolean = false
     //Builder 클래스 추가
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,6 +54,10 @@ class BottomDialog : DialogFragment() {
             )
             if(buttonLinearView != null)
                 view.addView(buttonLinearView)
+            if(layoutResID != null){
+                var userView = inflater.inflate(layoutResID!!,this,false)
+                addView(userView,0)
+            }
         }
         return view
     }
@@ -67,7 +71,10 @@ class BottomDialog : DialogFragment() {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
-            )
+            ).run {
+                setMargins(0,8,0,0)
+                this
+            }
             val positiveTextView = TextView(context)
             positiveTextView.apply {
                 setText(positiveText ?: "확인")

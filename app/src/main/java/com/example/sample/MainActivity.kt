@@ -9,6 +9,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        BottomDialog().show(supportFragmentManager,"Test")
+        BottomDialog().run {
+            layoutResID = R.layout.test
+            this
+        }.show(supportFragmentManager,"Test")
     }
 }
