@@ -14,6 +14,7 @@ class BottomDialog : DialogFragment() {
     var layoutResID: Int? = null
     var positiveTextColor: Int = Color.parseColor("#28A0FF")
     var negativeTextColor: Int = Color.parseColor("#000000")
+    var isButtonView: Boolean = true
     //Builder 클래스 추가
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +41,24 @@ class BottomDialog : DialogFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        var buttonLinearView: View? = null
+        if (isButtonView) {
+            buttonLinearView = createButtonView()
+        }
+        var view = LinearLayout(context)
+        view.apply {
+            orientation = LinearLayout.VERTICAL
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            if(buttonLinearView != null)
+                view.addView(buttonLinearView)
+        }
+        return view
+    }
+
+    private fun createButtonView(): View {
         var horizontalLinearLayout = LinearLayout(context)
         //Button 있는 리니어레이아웃
         horizontalLinearLayout.apply {
@@ -57,22 +76,21 @@ class BottomDialog : DialogFragment() {
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
-                )
+                ).run {
+                    setMargins(32, 0, 32, 0)
+                    this
+                }
             }
             val negativeTextView = TextView(context)
             negativeTextView.apply {
-                setText(negativeText?: "취소")
+                setText(negativeText ?: "취소")
                 setTextColor(negativeTextColor)
                 gravity = Gravity.CENTER
                 val params = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
-                ).run {
-                    setMargins(32, 0, 16, 0)
-                    this
-                }
+                )
                 layoutParams = params
-                setTextColor(Color.BLACK)
             }
             addView(negativeTextView)
             addView(positiveTextView)
