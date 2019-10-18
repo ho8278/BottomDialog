@@ -17,15 +17,15 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import java.lang.ref.WeakReference
 
-class BottomDialog : DialogFragment, BottomListener{
+class BottomDialog : DialogFragment, DialogInterface{
     companion object {
         var TAG = BottomDialog::class.java.simpleName
         lateinit var positiveText: CharSequence
         lateinit var negativeText: CharSequence
         private var positiveTextColor: Int = Color.parseColor("#28A0FF")
         private var negativeTextColor: Int = Color.parseColor("#000000")
-        private var positiveClickListener: BottomListener.OnClickListener? = null
-        private var negativeClickListener: BottomListener.OnClickListener? = null
+        private var positiveClickListener: OnClickListener? = null
+        private var negativeClickListener: OnClickListener? = null
         private var isPositiveTextView = false
         private var isNegativeTextView = false
         private var layoutResID: Int? = null
@@ -79,7 +79,7 @@ class BottomDialog : DialogFragment, BottomListener{
     }
 
     override fun cancel() {
-        super.dismiss()
+        super.onCancel(this)
     }
 
     private fun createTextView(): View {
@@ -140,14 +140,14 @@ class BottomDialog : DialogFragment, BottomListener{
         }
 
 
-        fun setPositiveTextView(@StringRes textId: Int, listener: BottomListener.OnClickListener? = null): Builder {
+        fun setPositiveTextView(@StringRes textId: Int, listener: OnClickListener? = null): Builder {
             positiveText = context.getText(textId)
             positiveClickListener = listener
             isPositiveTextView = true
             return this
         }
 
-        fun setPositiveTextView(text: String, listener: BottomListener.OnClickListener? = null): Builder {
+        fun setPositiveTextView(text: String, listener: OnClickListener? = null): Builder {
             positiveText = text
             positiveClickListener = listener
             isPositiveTextView = true
@@ -164,14 +164,14 @@ class BottomDialog : DialogFragment, BottomListener{
             return this
         }
 
-        fun setNegativeTextView(@StringRes textId: Int, listener: BottomListener.OnClickListener? = null): Builder {
+        fun setNegativeTextView(@StringRes textId: Int, listener: OnClickListener? = null): Builder {
             negativeText =  instance.context?.getText(textId).toString()
             negativeClickListener = listener
             isNegativeTextView = true
             return this
         }
 
-        fun setNegativeTextView(text: String, listener: BottomListener.OnClickListener? = null): Builder {
+        fun setNegativeTextView(text: String, listener: OnClickListener? = null): Builder {
             negativeText = text
             negativeClickListener = listener
             isNegativeTextView = true
@@ -237,4 +237,7 @@ class BottomDialog : DialogFragment, BottomListener{
         }
     }
 
+    interface OnClickListener{
+        fun OnClick(listener:DialogInterface)
+    }
 }

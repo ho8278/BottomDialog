@@ -19,8 +19,8 @@ class MainActivity : AppCompatActivity() {
             .setLayout(R.layout.test)
             .setCancelable(false)
             .setPositiveTextViewColor(R.color.colorAccent)
-            .setPositiveTextView(R.string.app_name, object:BottomListener.OnClickListener{
-                override fun OnClick(listener: BottomListener) {
+            .setPositiveTextView(R.string.app_name, object:BottomDialog.OnClickListener{
+                override fun OnClick(listener: DialogInterface) {
                     listener.dismiss()
                 }
             })
