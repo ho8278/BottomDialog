@@ -25,7 +25,9 @@ class BottomDialog : DialogFragment, DialogInterface{
         private var positiveTextColor: Int = Color.parseColor("#28A0FF")
         private var negativeTextColor: Int = Color.parseColor("#000000")
         private var positiveClickListener: OnClickListener? = null
+        private var positiveBlock:(DialogInterface)->Unit = {}
         private var negativeClickListener: OnClickListener? = null
+        private var negativeBlock:(DialogInterface)->Unit = {}
         private var isPositiveTextView = false
         private var isNegativeTextView = false
         private var layoutResID: Int? = null
@@ -103,7 +105,10 @@ class BottomDialog : DialogFragment, DialogInterface{
                     setTextSize(TypedValue.COMPLEX_UNIT_SP,defaultTextSize)
                     layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
                     setOnClickListener {
-                        negativeClickListener?.OnClick(this@BottomDialog)
+                        if(negativeClickListener==null)
+                            negativeBlock(this@BottomDialog)
+                        else
+                            negativeClickListener?.OnClick(this@BottomDialog)
                     }
                 }
                 addView(negativeTextView)
@@ -122,7 +127,10 @@ class BottomDialog : DialogFragment, DialogInterface{
                             this
                         }
                     setOnClickListener {
-                        positiveClickListener?.OnClick(this@BottomDialog)
+                        if(positiveClickListener == null)
+                            positiveBlock(this@BottomDialog)
+                        else
+                            positiveClickListener?.OnClick(this@BottomDialog)
                     }
                 }
                 addView(positiveTextView)
@@ -154,6 +162,20 @@ class BottomDialog : DialogFragment, DialogInterface{
             return this
         }
 
+        fun setPositiveTextView(@StringRes textId: Int, listener: (DialogInterface)->Unit): Builder {
+            positiveText = context.getText(textId)
+            positiveBlock = listener
+            isPositiveTextView = true
+            return this
+        }
+
+        fun setPositiveTextView(text: String, listener: (DialogInterface)->Unit): Builder {
+            positiveText = text
+            positiveBlock = listener
+            isPositiveTextView = true
+            return this
+        }
+
         fun setPositiveTextViewColor(@ColorRes color:Int): Builder{
             positiveTextColor = ContextCompat.getColor(context,color)
             return this
@@ -178,6 +200,20 @@ class BottomDialog : DialogFragment, DialogInterface{
             return this
         }
 
+        fun setNegativeTextView(@StringRes textId: Int, listener: (DialogInterface)->Unit): Builder {
+            negativeText =  instance.context?.getText(textId).toString()
+            negativeBlock = listener
+            isNegativeTextView = true
+            return this
+        }
+
+        fun setNegativeTextView(text: String, listener: (DialogInterface)->Unit): Builder {
+            negativeText = text
+            negativeBlock = listener
+            isNegativeTextView = true
+            return this
+        }
+
         fun setNegativeTextViewColor(@ColorRes color:Int): Builder{
             negativeTextColor = ContextCompat.getColor(context,color)
             return this
@@ -187,34 +223,6 @@ class BottomDialog : DialogFragment, DialogInterface{
             negativeTextColor = Color.parseColor(color)
             return this
         }
-
-        /*
-
-        fun setPositiveTextView(text: String = "확인", color: Int = Color.parseColor("#28A0FF"), listener: () -> Unit = { instance.dismiss() }): BottomDialogBuilder {
-            positiveText = text
-            positiveTextColor = color
-            positiveClickListener = object : TextViewClickListener {
-                override fun onClick() {
-                    listener()
-                }
-            }
-            isPositiveTextView = true
-            return this
-        }
-
-        fun setNegativeTextView(text: String = "취소", color: Int = Color.parseColor("#000000"), listener: () -> Unit = { instance.dismiss() }): BottomDialogBuilder {
-            negativeText = text
-            negativeTextColor = color
-            negativeClickListener = object : TextViewClickListener {
-                override fun onClick() {
-                    listener()
-                }
-            }
-            isNegativeTextView = true
-            return this
-        }
-
-        */
 
         fun setLayout(layoutRes: Int): Builder {
             layoutResID = layoutRes
