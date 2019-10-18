@@ -32,6 +32,7 @@ class BottomDialog : DialogFragment, DialogInterface{
         private var isNegativeTextView = false
         private var layoutResID: Int? = null
         private var messageBody:String = ""
+        private var title:String = ""
     }
     private var defaultTextSize = 16.0f
     private constructor() : super()
@@ -57,7 +58,8 @@ class BottomDialog : DialogFragment, DialogInterface{
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
         //기능 확장: 타이틀 붙일수 있게 Builder 함수 추가
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        //dialog.setTitle("TEST")
         return dialog
     }
 
@@ -70,12 +72,24 @@ class BottomDialog : DialogFragment, DialogInterface{
         view.apply {
             if (textLinearView != null)
                 addView(textLinearView)
+            if(!title.isEmpty()){
+                findViewById<TextView>(R.id.tv_title).text = title
+            }
+            else
+                removeView(findViewById<TextView>(R.id.tv_title))
+
             if (layoutResID != null) {
                 var userView = inflater.inflate(layoutResID!!, this, false)
-                addView(userView, 0)
+                if(title.isEmpty())
+                    addView(userView, 0)
+                else
+                    addView(userView,1)
             }
+
             if(!messageBody.isEmpty())
-                view.findViewById<TextView>(R.id.tv_msg).text = messageBody
+                findViewById<TextView>(R.id.tv_msg).text = messageBody
+            else
+                removeView(findViewById<TextView>(R.id.tv_msg))
         }
         return view
     }
@@ -236,6 +250,11 @@ class BottomDialog : DialogFragment, DialogInterface{
 
         fun setMessage(msg:String):Builder{
             messageBody = msg
+            return this
+        }
+
+        fun setTitle(str:String):Builder{
+            title = str
             return this
         }
 
